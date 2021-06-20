@@ -6,13 +6,15 @@ from models import models
 from db import configuration
 from typing import List
 from core.repositories import user
+from core.crawlers.RankedPages import RankedPages
 
 router = APIRouter(
-    tags=["Users"],
-    prefix="/users"
+    tags=["Crawler"],
+    prefix="/crawler"
 )
-get_db = configuration.get_db
 
-@router.get("/", status_code=status.HTTP_200_OK)
-def get_users(db: Session = Depends(get_db)):
-    return user.get_all(db)
+@router.get("/get_most_visted_pages", status_code=status.HTTP_200_OK)
+def get_most_visited_pages(website: str):
+    rankedPages = RankedPages(website)
+    ranked_pages_links = rankedPages.get_suggested_pages(limit=10)
+    return {'status': status.HTTP_200_OK, 'data': ranked_pages_links}
